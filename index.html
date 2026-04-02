@@ -1,0 +1,328 @@
+<DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>inVision U — Система отбора кандидатов</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<header id="main-header">
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <div class="logo-mark">
+        <svg viewBox="0 0 20 20"><path d="M10 3L17 7v6l-7 4-7-4V7z"/><path d="M10 3v14M3 7l7 4 7-4"/></svg>
+      </div>
+      <div class="logo-text">
+        <div class="logo-name">inVision U</div>
+        <div class="logo-sub">Admission AI</div>
+      </div>
+    </a>
+    <nav>
+      <button class="nav-btn active" onclick="showPage('shortlist', this)"><span>Шортлист</span></button>
+      <button class="nav-btn" onclick="showPage('analyze', this)"><span>Анализ заявки</span></button>
+      <button class="nav-btn" onclick="showPage('method', this)"><span>Методология</span></button>
+      <button class="nav-btn" onclick="showPage('activity', this)"><span>Активность</span></button>
+    </nav>
+  </div>
+</header>
+
+<div class="hero" id="hero-section">
+  <div class="hero-orb"></div>
+  <div class="hero-orb"></div>
+  <div class="hero-orb"></div>
+  <div class="hero-inner">
+    <div>
+      <h1>Интеллектуальная система<br><em>поддержки отбора кандидатов</em></h1>
+      <p>AI-ассистент приёмной комиссии — анализирует заявки, выявляет потенциал и формирует рекомендации. Финальное решение всегда за комиссией.</p>
+      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn" style="background:rgba(255,255,255,0.12);color:white;border:1px solid rgba(255,255,255,0.2);padding:8px 18px;font-size:13px;" onclick="showPage('analyze', document.querySelectorAll('.nav-btn')[1])">
+          + Новая заявка
+        </button>
+        <button class="btn" style="background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.12);padding:8px 18px;font-size:13px;" onclick="showPage('method', document.querySelectorAll('.nav-btn')[2])">
+          Методология →
+        </button>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num" id="counter-total">0</div>
+        <div class="hero-stat-label">Заявок</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num" id="counter-short">0</div>
+        <div class="hero-stat-label">В шортлисте</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num" id="counter-dims">0</div>
+        <div class="hero-stat-label">Измерений</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ticker-wrap" style="margin-top:2rem;margin-left:-2rem;margin-right:-2rem;margin-bottom:-3.5rem;">
+    <div class="ticker" id="ticker"></div>
+  </div>
+</div>
+
+<main>
+  <div class="page active" id="page-shortlist">
+    <div class="metrics-row">
+      <div class="metric" onclick="filterCandidates('all', document.querySelectorAll('.filter-pill')[0])" style="cursor:pointer;">
+        <div class="metric-icon" style="background:#E8F2EE;">📋</div>
+        <div class="metric-label">Всего заявок</div>
+        <div class="metric-value">247</div>
+        <div class="metric-sub">Поток 2025</div>
+      </div>
+      <div class="metric" onclick="filterCandidates('high', document.querySelectorAll('.filter-pill')[1])" style="cursor:pointer;">
+        <div class="metric-icon" style="background:#E8F0FA;">🏆</div>
+        <div class="metric-label">В шортлисте</div>
+        <div class="metric-value">38</div>
+        <div class="metric-sub">Рекомендованы AI</div>
+      </div>
+      <div class="metric" onclick="filterCandidates('flag', document.querySelectorAll('.filter-pill')[3])" style="cursor:pointer;">
+        <div class="metric-icon" style="background:#FDF4DC;">⚠️</div>
+        <div class="metric-label">AI-флаги</div>
+        <div class="metric-value">14</div>
+        <div class="metric-sub">Требуют проверки</div>
+      </div>
+      <div class="metric" onclick="filterCandidates('review', document.querySelectorAll('.filter-pill')[2])" style="cursor:pointer;">
+        <div class="metric-icon" style="background:#FAEAEA;">⏳</div>
+        <div class="metric-label">На рассмотрении</div>
+        <div class="metric-value">52</div>
+        <div class="metric-sub">Ожидают комиссию</div>
+      </div>
+    </div>
+
+    <div id="list-section">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Топ кандидатов — сезон 2025</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <div class="filter-row">
+              <button class="filter-pill active" onclick="filterCandidates('all', this)">Все</button>
+              <button class="filter-pill" onclick="filterCandidates('high', this)">Высокий потенциал</button>
+              <button class="filter-pill" onclick="filterCandidates('review', this)">На проверке</button>
+              <button class="filter-pill" onclick="filterCandidates('flag', this)">AI-флаг</button>
+            </div>
+          </div>
+        </div>
+        <div style="padding:1rem 1.5rem 0;">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input class="search-input" id="search-input" placeholder="Поиск по имени или школе…" oninput="searchCandidates(this.value)">
+          </div>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="candidate-table">
+            <thead>
+              <tr>
+                <th style="width:40px;">#</th>
+                <th class="sortable" onclick="sortBy('name')" id="th-name">Кандидат <span class="sort-arrow">↕</span></th>
+                <th>Теги</th>
+                <th class="sortable" style="text-align:right;" onclick="sortBy('score')" id="th-score">Балл <span class="sort-arrow">↕</span></th>
+                <th style="width:40px;text-align:center;" title="Выбрать для сравнения">⊕</th>
+              </tr>
+            </thead>
+            <tbody id="candidates-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="detail-section" style="display:none;">
+      <button class="back-btn" onclick="showListSection()">← Вернуться к шортлисту</button>
+      <div id="detail-content"></div>
+    </div>
+  </div>
+  <div class="page" id="page-analyze">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Анализ новой заявки</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <svg id="form-progress-ring" class="progress-ring" width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="14" fill="none" stroke="var(--surface2)" stroke-width="3"/>
+              <circle id="form-progress-circle" cx="18" cy="18" r="14" fill="none" stroke="var(--accent-mid)" stroke-width="3"
+                stroke-dasharray="88" stroke-dashoffset="88" stroke-linecap="round" transform="rotate(-90 18 18)"
+                style="transition:stroke-dashoffset 0.5s cubic-bezier(0.23,1,0.32,1);"/>
+            </svg>
+            <span id="form-progress-label" style="font-size:12px;color:var(--text-3);">0%</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Имя кандидата</label>
+            <input class="form-input" id="inp-name" placeholder="Введите имя" value="Айгерим Сейткали" oninput="updateFormProgress()">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Школа / регион</label>
+              <input class="form-input" id="inp-school" placeholder="НИШ, Алматы" value="НИШ, г. Алматы" oninput="updateFormProgress()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Успеваемость</label>
+              <select class="form-select" id="inp-grades" onchange="updateFormProgress()">
+                <option>Отличник (A)</option>
+                <option>Хорошист (B)</option>
+                <option>Средний (C)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Мотивационное эссе</label>
+            <textarea class="form-textarea" id="inp-essay" style="min-height:160px;" oninput="updateFormProgress();updateCharCount(this,'essay-counter',2000)">Я выросла в небольшом ауле в Жамбылской области, где не было хорошего интернета и почти не было примеров успешных предпринимателей. С 14 лет я организовывала субботники и собирала деньги на учебники для одноклассников, у которых не было возможности купить их. Это научило меня видеть проблемы и искать конкретные решения, а не ждать помощи. В прошлом году я запустила небольшой Telegram-канал о местной экологии, который набрал 2400 подписчиков и помог добиться уборки стихийной свалки — мы собрали 300 подписей жителей и передали их в акимат. inVision U для меня — это не просто образование, а сообщество людей, которые меняют мир с нуля, как я.</textarea>
+            <div class="char-counter" id="essay-counter">0 / 2000</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Достижения и опыт</label>
+            <input class="form-input" id="inp-achievements" placeholder="Олимпиады, проекты, лидерские роли" value="Победитель олимпиады по экономике, волонтёр 2 года, организатор школьного совета" oninput="updateFormProgress()">
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary" id="analyze-btn" onclick="analyzeCandidate()">
+              Анализировать
+            </button>
+            <button class="btn btn-ghost" onclick="clearForm()">Очистить</button>
+            <button class="btn btn-ghost" onclick="loadSampleCandidate()">Загрузить пример</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="analyze-result">
+        <div class="card" style="height:100%;display:flex;align-items:center;justify-content:center;min-height:300px;">
+          <div style="text-align:center;color:var(--text-3);">
+            <div style="font-size:40px;margin-bottom:12px;">🔍</div>
+            <div style="font-size:14px;">Заполните форму и нажмите<br>«Анализировать» для получения оценки</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page" id="page-method">
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="card-header"><div class="card-title">Веса измерений</div></div>
+      <div class="card-body" id="weight-bars"></div>
+    </div>
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="card-header">
+        <div class="card-title">Интерактивная настройка весов</div>
+        <span class="tag tag-amber" id="weights-sum-tag">Сумма: 100%</span>
+      </div>
+      <div class="card-body" id="weight-sliders"></div>
+    </div>
+
+    <div class="method-grid" style="margin-bottom:1.5rem;">
+      <div class="method-card">
+        <div class="method-icon">📊</div>
+        <div class="method-title">Многомерный скоринг</div>
+        <div class="method-text">Система оценивает кандидата по 5 измерениям: лидерский потенциал, мотивация и ценности, рост-траектория, аутентичность, практический опыт. Итоговая оценка — взвешенная сумма.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-icon">🤖</div>
+        <div class="method-title">Детектор генеративного ИИ</div>
+        <div class="method-text">Анализирует стилистику эссе: однородность синтаксиса, клише ИИ-текстов, отсутствие конкретных деталей. Флаг сигнализирует о необходимости живого разговора.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-icon">🌱</div>
+        <div class="method-title">Оценка пути, а не статуса</div>
+        <div class="method-text">Кандидат из малого города с реальным локальным проектом может получить более высокий балл, чем участник международных конференций без собственной инициативы.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-icon">👥</div>
+        <div class="method-title">Human-in-the-loop</div>
+        <div class="method-text">ИИ не принимает решений — только формирует рекомендацию с объяснением. Финальное слово всегда за комиссией. Каждая оценка сопровождается уточняющими вопросами.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">Ограничения системы</div></div>
+      <div class="card-body">
+        <div class="forbid-item"><span class="tag tag-red">Запрещено</span><span>Использование демографических данных как косвенного показателя успеха</span></div>
+        <div class="forbid-item"><span class="tag tag-red">Запрещено</span><span>Скрейпинг социальных сетей без явного согласия кандидата</span></div>
+        <div class="forbid-item"><span class="tag tag-red">Запрещено</span><span>Автономные решения о зачислении или отказе без участия комиссии</span></div>
+        <div class="forbid-item"><span class="tag tag-green">Активно</span><span>Все объяснения оценок видны комиссии в реальном времени</span></div>
+        <div class="forbid-item"><span class="tag tag-green">Активно</span><span>Персональные данные обрабатываются в соответствии с требованиями законодательства РК</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="page" id="page-activity">
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Лента активности</div>
+          <button class="btn btn-ghost" style="padding:5px 12px;font-size:12px;" onclick="addFeedItem()">+ Симулировать событие</button>
+        </div>
+        <div class="card-body" id="activity-feed"></div>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card-header"><div class="card-title">Статистика дня</div></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div style="background:var(--bg);border-radius:var(--radius);padding:12px;text-align:center;">
+                <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--accent-mid);" id="stat-analyzed">12</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:2px;">Проанализировано</div>
+              </div>
+              <div style="background:var(--bg);border-radius:var(--radius);padding:12px;text-align:center;">
+                <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--gold);" id="stat-approved">5</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:2px;">Одобрено</div>
+              </div>
+              <div style="background:var(--bg);border-radius:var(--radius);padding:12px;text-align:center;">
+                <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--danger);" id="stat-flagged">3</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:2px;">AI-флагов</div>
+              </div>
+              <div style="background:var(--bg);border-radius:var(--radius);padding:12px;text-align:center;">
+                <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--text-2);" id="stat-avg">79</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:2px;">Средний балл</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Онлайн сейчас</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:8px;" id="online-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+<div class="compare-bar" id="compare-bar">
+  <div class="compare-avatars" id="compare-avatars"></div>
+  <div class="compare-bar-label" id="compare-label">Выбрано 0 кандидатов</div>
+  <button class="compare-btn" onclick="openCompare()">Сравнить →</button>
+  <button class="compare-clear" onclick="clearCompare()">Сбросить</button>
+</div>
+<div class="modal-overlay" id="compare-modal" onclick="closeCompare(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div style="font-weight:500;">Сравнение кандидатов</div>
+      <button class="modal-close" onclick="closeCompare()">✕</button>
+    </div>
+    <div class="modal-body" id="compare-content"></div>
+  </div>
+</div>
+<div class="toast-container" id="toast-container"></div>
+<div class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left"><strong>inVision U Admission AI</strong> — Decentrathon 5.0 · Трек AI inDrive</div>
+    <div class="footer-right">
+      <span class="footer-link">Прозрачность решений</span>
+      <span class="footer-link">Защита данных</span>
+      <span class="footer-link">Документация</span>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
